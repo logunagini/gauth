@@ -1,0 +1,133 @@
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <title>Google Sign-In Example</title>
+  <meta name="google-signin-client_id" content="314139210737-j7q1cv2cols47gu1tqcson0rnhm0tmrk.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+<body>
+  <h1>Google Sign-In Example</h1>
+  <div class="g-signin2" data-onsuccess="onSignIn"></div>
+  <button onclick="signOut()">Sign Out</button>
+
+  <script>
+    function onSignIn(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log("ID: " + profile.getId());
+      console.log('Full Name: ' + profile.getName());
+      console.log('Given Name: ' + profile.getGivenName());
+      console.log('Family Name: ' + profile.getFamilyName());
+      console.log("Image URL: " + profile.getImageUrl());
+      console.log("Email: " + profile.getEmail());
+
+      var id_token = googleUser.getAuthResponse().id_token;
+      console.log("ID Token: " + id_token);
+
+      fetch('/tokensignin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ idtoken: id_token })
+      }).then(response => response.text()).then(data => {
+        console.log(data);
+      }).catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+    function signOut() {
+      var auth2 = gapi.auth2.getAuthInstance();
+      auth2.signOut().then(function () {
+        console.log('User signed out.');
+      });
+    }
+
+    function startApp() {
+      gapi.load('auth2', function() {
+        gapi.auth2.init({
+          client_id: '314139210737-j7q1cv2cols47gu1tqcson0rnhm0tmrk.apps.googleusercontent.com'
+        });
+      });
+    }
+  </script>
+  <script>startApp();</script>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Google Sign-In Example</title>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+  <h1>Google Sign-In Example</h1>
+  
+  <!-- The button will be automatically rendered here by Google Identity Services -->
+  <div id="g_id_onload"
+       data-client_id="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com"
+       data-callback="handleCredentialResponse">
+  </div>
+  <div class="g_id_signin" data-type="standard"></div>
+
+  <button onclick="signOut()">Sign Out</button>
+
+  <script>
+    function handleCredentialResponse(response) {
+      // Parse the ID token from the response
+      const responsePayload = decodeJwtResponse(response.credential);
+      console.log("ID: " + responsePayload.sub);
+      console.log('Full Name: ' + responsePayload.name);
+      console.log('Given Name: ' + responsePayload.given_name);
+      console.log('Family Name: ' + responsePayload.family_name);
+      console.log("Image URL: " + responsePayload.picture);
+      console.log("Email: " + responsePayload.email);
+
+      // You can send this ID token to your server for further validation
+      fetch('/tokensignin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_token: response.credential })
+      })
+      .then(response => response.text())
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+    }
+
+    function decodeJwtResponse(token) {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+      }).join(''));
+      return JSON.parse(jsonPayload);
+    }
+
+    function signOut() {
+      google.accounts.id.disableAutoSelect();
+      console.log('User signed out.');
+    }
+
+    // Automatically render the Google Sign-In button
+    window.onload = function () {
+      google.accounts.id.initialize({
+        client_id: '205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com',
+        callback: handleCredentialResponse
+      });
+      google.accounts.id.renderButton(
+        document.querySelector(".g_id_signin"),
+        { theme: "outline", size: "large" }  // Customize the button
+      );
+      google.accounts.id.prompt();  // Optional, prompts the user to select a Google account
+    };
+  </script>
+</body>
+</html>
