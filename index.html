@@ -1,59 +1,3 @@
-<!-- <!DOCTYPE html>
-<html>
-<head>
-  <title>Google Sign-In Example</title>
-  <meta name="google-signin-client_id" content="314139210737-j7q1cv2cols47gu1tqcson0rnhm0tmrk.apps.googleusercontent.com">
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
-</head>
-<body>
-  <h1>Google Sign-In Example</h1>
-  <div class="g-signin2" data-onsuccess="onSignIn"></div>
-  <button onclick="signOut()">Sign Out</button>
-
-  <script>
-    function onSignIn(googleUser) {
-      var profile = googleUser.getBasicProfile();
-      console.log("ID: " + profile.getId());
-      console.log('Full Name: ' + profile.getName());
-      console.log('Given Name: ' + profile.getGivenName());
-      console.log('Family Name: ' + profile.getFamilyName());
-      console.log("Image URL: " + profile.getImageUrl());
-      console.log("Email: " + profile.getEmail());
-
-      var id_token = googleUser.getAuthResponse().id_token;
-      console.log("ID Token: " + id_token);
-
-      fetch('/tokensignin', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ idtoken: id_token })
-      }).then(response => response.text()).then(data => {
-        console.log(data);
-      }).catch(error => {
-        console.error('Error:', error);
-      });
-    }
-
-    function signOut() {
-      var auth2 = gapi.auth2.getAuthInstance();
-      auth2.signOut().then(function () {
-        console.log('User signed out.');
-      });
-    }
-
-    function startApp() {
-      gapi.load('auth2', function() {
-        gapi.auth2.init({
-          client_id: '314139210737-j7q1cv2cols47gu1tqcson0rnhm0tmrk.apps.googleusercontent.com'
-        });
-      });
-    }
-  </script>
-  <script>startApp();</script>
-</body>
-</html> -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -61,6 +5,42 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Google Sign-In Example</title>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+
+    .g_id_signin {
+      margin-bottom: 80px;
+    }
+
+    #email-display {
+      margin-top: 20px;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      color: #ffffff;
+      background-color: #4285F4;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #3367D6;
+    }
+
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+  </style>
 </head>
 <body>
   <h1>Google Sign-In Example</h1>
@@ -69,15 +49,22 @@
        data-client_id="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com"
        data-callback="handleCredentialResponse">
   </div>
+  
   <div class="g_id_signin" data-type="standard"></div>
 
-  <button onclick="signOut()">Sign Out</button>
+  <div id="email-display"></div>
+
+  <button id="signout-button" onclick="signOut()" disabled>Sign Out</button>
 
   <script>
     let responsePayload;
 
     function handleCredentialResponse(response) {
       responsePayload = decodeJwtResponse(response.credential);
+
+      document.getElementById('email-display').textContent = "Signed in as: " + responsePayload.email;
+      document.getElementById('signout-button').disabled = false;
+
       console.log("ID: " + responsePayload.sub);
       console.log('Full Name: ' + responsePayload.name);
       console.log('Given Name: ' + responsePayload.given_name);
@@ -113,6 +100,8 @@
     function signOut() {
       google.accounts.id.revoke(responsePayload.email, done => {
         console.log('User signed out.');
+        document.getElementById('email-display').textContent = "";
+        document.getElementById('signout-button').disabled = true;
       });
     }
 

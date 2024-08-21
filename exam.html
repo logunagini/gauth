@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Google Sign-In Example</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <h1>Google Sign-In Example</h1>
+                <div id="g_id_onload"
+                    data-client_id="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com"
+                    data-auto_prompt="false">
+                </div>
+                <div class="g_id_signin"
+                    data-type="standard"
+                    data-size="large"
+                    data-theme="outline"
+                    data-text="sign_in_with"
+                    data-shape="rectangular"
+                    data-logo_alignment="left">
+                </div>
+                <button id="signOut" class="btn btn-danger mt-3" style="display: none;">Sign Out</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Google API JS -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        function handleCredentialResponse(response) {
+            console.log("Encoded JWT ID token: " + response.credential);
+
+            const data = JSON.parse(atob(response.credential.split('.')[1]));
+            console.log('User Info:', data);
+
+            document.getElementById("signOut").style.display = "block";
+        }
+
+        window.onload = function () {
+            google.accounts.id.initialize({
+                client_id: '205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com',
+                callback: handleCredentialResponse
+            });
+
+            google.accounts.id.renderButton(
+                document.querySelector('.g_id_signin'),
+                { theme: 'outline', size: 'large' }
+            );
+
+            google.accounts.id.prompt(); // Show the One Tap prompt
+        };
+
+        document.getElementById('signOut').addEventListener('click', function () {
+            google.accounts.id.disableAutoSelect();
+            this.style.display = 'none';
+            alert('You have been signed out.');
+        });
+    </script>
+</body>
+</html>

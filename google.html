@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Sign In with Google</title>
+  <meta name="google-signin-client_id" content="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com">
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+</head>
+<body>
+  <h2>Sign In</h2>
+  <div class="g-signin2" data-onsuccess="onSignIn"></div>
+
+  <script>
+    function onSignIn(googleUser) {
+      var profile = googleUser.getBasicProfile();
+      console.log('ID: ' + profile.getId());
+      console.log('Name: ' + profile.getName());
+      console.log('Email: ' + profile.getEmail());
+
+      // Perform sign-in actions here, like storing tokens and redirecting
+      var id_token = googleUser.getAuthResponse().id_token;
+      
+      // Send token to your server to validate and create a session
+      fetch('/auth/google', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id_token: id_token }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data);
+        // Redirect to dashboard or home page
+        window.location.href = '/dashboard'; 
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+    }
+    const { OAuth2Client } = require('google-auth-library');
+const client = new OAuth2Client('205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com');
+
+async function verifyToken(idToken) {
+  const ticket = await client.verifyIdToken({
+    idToken: idToken,
+    audience: '205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com',
+  });
+  const payload = ticket.getPayload();
+  const userid = payload['sub'];
+  // Store user information and create a session here
+  return payload;
+}
+
+  </script>
+</body>
+</html>
