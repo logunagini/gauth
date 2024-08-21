@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Google Sign-In Example</title>
+    <title>Google Sign-In with Email & Password</title>
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
@@ -12,6 +12,22 @@
         <div class="row justify-content-center">
             <div class="col-md-6 text-center">
                 <h1>Google Sign-In Example</h1>
+                
+                <!-- Email and Password Form -->
+                <form id="authForm">
+                    <div class="form-group">
+                        <label for="email">Email address</label>
+                        <input type="email" class="form-control" id="email" placeholder="Enter email">
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password">
+                    </div>
+                    <button id="signUp" class="btn btn-primary btn-block">Sign Up</button>
+                    <button id="signIn" class="btn btn-success btn-block mt-2">Sign In</button>
+                </form>
+
+                <!-- Google Sign-In Button -->
                 <div id="g_id_onload"
                     data-client_id="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com"
                     data-auto_prompt="false">
@@ -24,7 +40,15 @@
                     data-shape="rectangular"
                     data-logo_alignment="left">
                 </div>
+
+                <!-- Sign Out Button -->
                 <button id="signOut" class="btn btn-danger mt-3" style="display: none;">Sign Out</button>
+
+                <!-- User Info Display -->
+                <div id="userInfo" class="mt-3" style="display: none;">
+                    <p>Email: <span id="userEmail"></span></p>
+                    <p>Name: <span id="userName"></span></p>
+                </div>
             </div>
         </div>
     </div>
@@ -35,12 +59,13 @@
     <!-- Custom JavaScript -->
     <script>
         function handleCredentialResponse(response) {
-            console.log("Encoded JWT ID token: " + response.credential);
-
             const data = JSON.parse(atob(response.credential.split('.')[1]));
             console.log('User Info:', data);
 
-            document.getElementById("signOut").style.display = "block";
+            document.getElementById('userEmail').textContent = data.email;
+            document.getElementById('userName').textContent = data.name;
+            document.getElementById('userInfo').style.display = 'block';
+            document.getElementById('signOut').style.display = 'block';
         }
 
         window.onload = function () {
@@ -54,13 +79,34 @@
                 { theme: 'outline', size: 'large' }
             );
 
-            google.accounts.id.prompt(); // Show the One Tap prompt
+            google.accounts.id.prompt();
         };
 
         document.getElementById('signOut').addEventListener('click', function () {
-            google.accounts.id.disableAutoSelect();
-            this.style.display = 'none';
-            alert('You have been signed out.');
+            if (confirm('Are you sure you want to sign out?')) {
+                google.accounts.id.disableAutoSelect();
+                this.style.display = 'none';
+                document.getElementById('userInfo').style.display = 'none';
+                alert('You have been signed out.');
+            }
+        });
+
+        // Handling email/password sign-up
+        document.getElementById('signUp').addEventListener('click', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            console.log(`Sign Up with Email: ${email}, Password: ${password}`);
+            // Add your sign-up logic here
+        });
+
+        // Handling email/password sign-in
+        document.getElementById('signIn').addEventListener('click', function (event) {
+            event.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            console.log(`Sign In with Email: ${email}, Password: ${password}`);
+            // Add your sign-in logic here
         });
     </script>
 </body>
