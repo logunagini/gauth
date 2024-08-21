@@ -30,7 +30,7 @@
                 <!-- Google Sign-In Button -->
                 <div id="g_id_onload"
                     data-client_id="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com"
-                    data-auto_prompt="false">
+                    data-callback="handleCredentialResponse">
                 </div>
                 <div class="g_id_signin"
                     data-type="standard"
@@ -79,14 +79,14 @@
                 { theme: 'outline', size: 'large' }
             );
 
-            google.accounts.id.prompt();
+            google.accounts.id.prompt();  // Automatically prompt the user
         };
 
         document.getElementById('signOut').addEventListener('click', function () {
             if (confirm('Are you sure you want to sign out?')) {
                 google.accounts.id.disableAutoSelect();
-                this.style.display = 'none';
                 document.getElementById('userInfo').style.display = 'none';
+                document.getElementById('signOut').style.display = 'none';
                 alert('You have been signed out.');
             }
         });
