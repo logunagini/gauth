@@ -1,22 +1,95 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dashboard</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent">
+    <title>Sign In</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+        .button-group button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #000;
+            background-color: white;
+            cursor: pointer;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .input-field {
+            margin: 10px 0;
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #000;
+        }
+        .signup-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid #000;
+            background-color: white;
+            cursor: pointer;
+        }
+        .g-signin2 {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h2>Welcome, User</h2>
-  <a href="google.html">Sign In Again</a>
-  <button onclick="signOut()">Sign Out</button>
+    <div class="container" id="sign-in-page">
+        <div class="button-group">
+            <button id="signup-button">SignUp</button>
+            <button id="signin-button">SignIn</button>
+        </div>
+        <h1>SignUp</h1>
+        <input type="email" id="email" class="input-field" placeholder="abc@gmail.com">
+        <input type="password" id="password" class="input-field" placeholder="Password">
+        <button class="signup-button">signup</button>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
 
-  <script>
-    function signOut() {
-      var auth2 = gapi.auth2.getAuthInstance();
-      auth2.signOut().then(function () {
-        console.log('User signed out.');
-        // Redirect to sign-in page
-        window.location.href = '/sign-in'; 
-      });
-    }
-  </script>
+    <div class="container" id="home-page" style="display: none;">
+        <h1>Home</h1>
+        <button class="signup-button" onclick="signOut()">SignOut</button>
+    </div>
+
+    <script>
+        function onSignIn(googleUser) {
+            document.getElementById('sign-in-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'block';
+        }
+
+        function signOut() {
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+                document.getElementById('sign-in-page').style.display = 'block';
+                document.getElementById('home-page').style.display = 'none';
+            });
+        }
+
+        function onLoad() {
+            gapi.load('auth2', function() {
+                gapi.auth2.init().then(function() {
+                    console.log('Google API initialized.');
+                });
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 </body>
 </html>
+

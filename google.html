@@ -1,56 +1,92 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Sign In with Google</title>
-  <meta name="google-signin-client_id" content="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com">
-  <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="google-signin-client_id" content="205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent">
+    <title>Sign In</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            text-align: center;
+        }
+        .button-group {
+            margin-bottom: 20px;
+        }
+        .button-group button {
+            padding: 10px 20px;
+            margin: 5px;
+            border: 1px solid #000;
+            background-color: white;
+            cursor: pointer;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+        }
+        .input-field {
+            margin: 10px 0;
+            padding: 10px;
+            width: 200px;
+            border: 1px solid #000;
+        }
+        .signup-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            border: 1px solid #000;
+            background-color: white;
+            cursor: pointer;
+        }
+        .g-signin2 {
+            margin-top: 20px;
+        }
+    </style>
 </head>
 <body>
-  <h2>Sign In</h2>
-  <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    <div class="container" id="sign-in-page">
+        <div class="button-group">
+            <button id="signup-button">SignUp</button>
+            <button id="signin-button">SignIn</button>
+        </div>
+        <h1>SignUp</h1>
+        <input type="email" id="email" class="input-field" placeholder="abc@gmail.com">
+        <input type="password" id="password" class="input-field" placeholder="Password">
+        <button class="signup-button">signup</button>
+        <div class="g-signin2" data-onsuccess="onSignIn"></div>
+    </div>
 
-  <script>
-    function onSignIn(googleUser) {
-      var profile = googleUser.getBasicProfile();
-      console.log('ID: ' + profile.getId());
-      console.log('Name: ' + profile.getName());
-      console.log('Email: ' + profile.getEmail());
+    <div class="container" id="home-page" style="display: none;">
+        <h1>Home</h1>
+        <button class="signup-button" onclick="signOut()">SignOut</button>
+    </div>
 
-      // Perform sign-in actions here, like storing tokens and redirecting
-      var id_token = googleUser.getAuthResponse().id_token;
-      
-      // Send token to your server to validate and create a session
-      fetch('/auth/google', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ id_token: id_token }),
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('Success:', data);
-        // Redirect to dashboard or home page
-        window.location.href = '/dashboard'; 
-      })
-      .catch((error) => {
-        console.error('Error:', error);
-      });
-    }
-    const { OAuth2Client } = require('google-auth-library');
-const client = new OAuth2Client('205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com');
+    <script>
+        function onSignIn(googleUser) {
+            document.getElementById('sign-in-page').style.display = 'none';
+            document.getElementById('home-page').style.display = 'block';
+        }
 
-async function verifyToken(idToken) {
-  const ticket = await client.verifyIdToken({
-    idToken: idToken,
-    audience: '205468551568-easqmig20adbo9ltqikqf5cl91566koc.apps.googleusercontent.com',
-  });
-  const payload = ticket.getPayload();
-  const userid = payload['sub'];
-  // Store user information and create a session here
-  return payload;
-}
+        function signOut() {
+            var auth2 = gapi.auth2.getAuthInstance();
+            auth2.signOut().then(function () {
+                console.log('User signed out.');
+                document.getElementById('sign-in-page').style.display = 'block';
+                document.getElementById('home-page').style.display = 'none';
+            });
+        }
 
-  </script>
+        function onLoad() {
+            gapi.load('auth2', function() {
+                gapi.auth2.init();
+            });
+        }
+    </script>
+    <script src="https://apis.google.com/js/platform.js?onload=onLoad" async defer></script>
 </body>
 </html>
